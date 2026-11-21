@@ -30,6 +30,28 @@ for(const type of ['pointerdown','keydown','scroll'])window.addEventListener(typ
 ${motionMarker}`);
 app = app.replace('const shouldPlay=()=>!document.hidden', 'const shouldPlay=()=>decorationReady&&!navigator.connection?.saveData&&!document.hidden');
 app = app.replace(' document.addEventListener(\'visibilitychange\',resumeBackground);', " document.addEventListener('dcr:decoration-ready',resumeBackground);\n document.addEventListener('visibilitychange',resumeBackground);");
+
+// Contact controls initialize immediately. Below-the-fold effects and gallery
+// cloning wait until their section approaches the viewport, avoiding forced
+// layout of the whole page during the first render.
+const runNearView = `function runNearView(element, initialize){
+ if(!element)return;
+ if(!('IntersectionObserver' in window)){initialize();return;}
+ const observer=new IntersectionObserver(entries=>{if(entries.some(entry=>entry.isIntersecting)){observer.disconnect();initialize();}},{rootMargin:'350px'});
+ observer.observe(element);
+}\n`;
+app = app.replace("'use strict';", "'use strict';\n" + runNearView);
+function deferBlock(start, end, selector) {
+ const from = app.indexOf(start), to = app.indexOf(end, from);
+ assert(from >= 0 && to > from, `Expected feature block: ${selector}`);
+ const block = app.slice(from, to);
+ app = app.slice(0, from) + `runNearView(document.querySelector('${selector}'),()=>{\n${block}\n});` + app.slice(to);
+}
+app = app.replace("const cards=[...serviceOrbit.querySelectorAll('.card')];", "const cards=[...serviceOrbit.querySelectorAll('.card:not(.service-loop-copy)')];");
+deferBlock("const whySection=document.querySelector('.why-section');", '\n\nconst reviewStage=', '.why-section');
+deferBlock("const reviewStage=document.querySelector('.customer-review-stage');", '\n\n// Our Services cards', '.customer-review-stage');
+deferBlock("const transportViewport=document.querySelector('.transport-viewport');", '\n\n// Pause the orbit', '.transport-viewport');
+deferBlock("const serviceOrbit=document.querySelector('.service-carousel');", '\n\n// Suspend offscreen', '.service-carousel');
 write('dist/app.js', app);
 const version = createHash('sha256').update(app).digest('hex').slice(0, 12);
 
