@@ -7,7 +7,7 @@ function requestLocation(event) {
  const openWhatsApp = !event?.currentTarget?.closest('.booking-form');
  for (const button of locationButtons) {
   button.disabled = true;button.classList.remove('is-ready');
-  button.querySelector('span').textContent = 'Finding your location…';
+  button.querySelector('span').textContent = 'Finding your location';
  }
  const previous = currentLocation?.mapsURL;
  for (const form of document.querySelectorAll('.booking-form')) {
