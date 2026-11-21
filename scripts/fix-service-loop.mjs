@@ -14,7 +14,7 @@ let index = 0;
 const updated = section
   .replace(/--quantity:\d+;/, `--quantity:${cards.length};`)
   .replace(/--index:\d+;/g, () => `--index:${index++};`)
-  .replace('<div class="service-carousel wrapper">', '<button type="button" class="service-loop-toggle" aria-pressed="false" aria-controls="service-loop">Pause cards</button><div class="service-carousel wrapper" id="service-loop">');
+  .replace('<div class="service-carousel wrapper">', '<div class="service-carousel wrapper" id="service-loop">');
 assert.equal(index, cards.length);
 html = html.replace(section, updated);
 for (const name of ['service-loop.css', 'service-loop.js']) {

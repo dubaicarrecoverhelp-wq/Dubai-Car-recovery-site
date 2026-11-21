@@ -3,7 +3,6 @@
   if (!carousel) return;
   const track = carousel.querySelector('.inner');
   const cards = [...track.children];
-  const toggle = document.querySelector('.service-loop-toggle');
   const group = document.createElement('div');
   group.className = 'service-loop-group';
   group.append(...cards);
@@ -38,11 +37,6 @@
     track.style.setProperty('--loop-duration', `${group.getBoundingClientRect().width / 40}s`);
     carousel.classList.add('is-looping');
   }
-  toggle.addEventListener('click', () => {
-    const paused = carousel.classList.toggle('is-user-paused');
-    toggle.setAttribute('aria-pressed', String(paused));
-    toggle.textContent = paused ? 'Resume cards' : 'Pause cards';
-  });
   carousel.addEventListener('focusin', event => {
     const card = event.target.closest('.card');
     if (!card || card.classList.contains('service-loop-copy')) return;
@@ -60,4 +54,28 @@
     frame = requestAnimationFrame(sizeLoop);
   });
   observer.observe(carousel);
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  // Move around the visible front of a shallow cylinder. The fixed track pitch
+  // and identical repeated halves preserve the same gap across the loop seam.
+  let arcFrame;
+  function drawArc() {
+    arcFrame = undefined;
+    if (document.hidden || reducedMotion.matches || carousel.closest('.motion-dormant')) return;
+    const bounds = carousel.getBoundingClientRect();
+    const center = bounds.left + bounds.width / 2;
+    const trackLeft = track.getBoundingClientRect().left;
+    for (const card of track.querySelectorAll('.card')) {
+      const x = trackLeft + card.offsetLeft + card.offsetWidth / 2;
+      const u = Math.max(-1, Math.min(1, (x - center) / (bounds.width / 2 + card.offsetWidth / 2)));
+      card.style.transform = `translateY(${14 * (1 - u * u)}px) rotateY(${-18 * u}deg)`;
+    }
+    arcFrame = requestAnimationFrame(drawArc);
+  }
+  function resumeArc() {
+    if (arcFrame === undefined) drawArc();
+  }
+  new MutationObserver(resumeArc).observe(carousel.closest('section'), {attributes: true, attributeFilter: ['class']});
+  document.addEventListener('visibilitychange', resumeArc);
+  reducedMotion.addEventListener('change', resumeArc);
+  resumeArc();
 })();
