@@ -75,3 +75,4 @@ execFileSync(process.execPath,['scripts/improve-homepage-call-path.mjs'],{stdio:
 execFileSync(process.execPath,['scripts/defer-header-motion.mjs'],{stdio:'inherit'});
 execFileSync(process.execPath,['scripts/verify-static.mjs'],{stdio:'inherit'});
 execFileSync(process.execPath,['scripts/inject-gtm.mjs'],{stdio:'inherit'});
+execFileSync(process.execPath,['scripts/fix-service-loop.mjs'],{stdio:'inherit'});
