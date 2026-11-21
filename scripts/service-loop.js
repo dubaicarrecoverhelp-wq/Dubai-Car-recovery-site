@@ -20,6 +20,7 @@
     return copy;
   }
   let frame;
+  let geometry = [];
   function sizeLoop() {
     track.querySelectorAll('.service-loop-copy').forEach(copy => copy.remove());
     track.querySelectorAll('[data-loop-copy]').forEach(copy => copy.remove());
@@ -36,6 +37,7 @@
     track.append(duplicate);
     track.style.setProperty('--loop-duration', `${group.getBoundingClientRect().width / 40}s`);
     carousel.classList.add('is-looping');
+    geometry = [...track.querySelectorAll('.card')].map(card => ({card, left: card.offsetLeft, width: card.offsetWidth}));
   }
   carousel.addEventListener('focusin', event => {
     const card = event.target.closest('.card');
@@ -48,25 +50,33 @@
     track.style.removeProperty('animation');
     track.style.removeProperty('transform');
   });
-  sizeLoop();
   const observer = new ResizeObserver(() => {
     cancelAnimationFrame(frame);
     frame = requestAnimationFrame(sizeLoop);
   });
-  observer.observe(carousel);
+  let loopInitialized = false;
+  function initializeLoop() {
+    if (loopInitialized) return;
+    loopInitialized = true;
+    sizeLoop();observer.observe(carousel);
+  }
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   // Move around the visible front of a shallow cylinder. The fixed track pitch
   // and identical repeated halves preserve the same gap across the loop seam.
   let arcFrame;
-  function drawArc() {
+  let arcVisible = false, lastDraw = 0;
+  function drawArc(time = 0) {
     arcFrame = undefined;
-    if (document.hidden || reducedMotion.matches || carousel.closest('.motion-dormant')) return;
+    if (document.hidden || reducedMotion.matches || !arcVisible) return;
+    if (time - lastDraw < 32) {arcFrame = requestAnimationFrame(drawArc);return;}
+    lastDraw = time;
     const bounds = carousel.getBoundingClientRect();
     const center = bounds.left + bounds.width / 2;
     const trackLeft = track.getBoundingClientRect().left;
-    for (const card of track.querySelectorAll('.card')) {
-      const x = trackLeft + card.offsetLeft + card.offsetWidth / 2;
-      const u = Math.max(-1, Math.min(1, (x - center) / (bounds.width / 2 + card.offsetWidth / 2)));
+    for (const {card, left, width} of geometry) {
+      const x = trackLeft + left + width / 2;
+      if (x + width / 2 < bounds.left || x - width / 2 > bounds.right) continue;
+      const u = Math.max(-1, Math.min(1, (x - center) / (bounds.width / 2 + width / 2)));
       card.style.transform = `translateY(${14 * (1 - u * u)}px) rotateY(${-18 * u}deg)`;
     }
     arcFrame = requestAnimationFrame(drawArc);
@@ -74,7 +84,9 @@
   function resumeArc() {
     if (arcFrame === undefined) drawArc();
   }
-  new MutationObserver(resumeArc).observe(carousel.closest('section'), {attributes: true, attributeFilter: ['class']});
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(entries => {arcVisible = entries.some(entry => entry.isIntersecting);if (arcVisible) initializeLoop();resumeArc();}, {rootMargin: '80px'}).observe(carousel);
+  } else {arcVisible = true;initializeLoop();}
   document.addEventListener('visibilitychange', resumeArc);
   reducedMotion.addEventListener('change', resumeArc);
   resumeArc();

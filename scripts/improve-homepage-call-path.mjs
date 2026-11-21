@@ -37,7 +37,7 @@ const styles = `<style id="homepage-call-path">
   body[data-page="home"] .hero-phone-number {
     display: flex; align-items: center; justify-content: center; width: 100%; min-height: 50px;
     margin-top: 10px; padding: 10px 14px; border: 1px solid #ff3658; border-radius: 12px;
-    background: #140d14; color: white; font-size: clamp(20px, 4.8vw, 26px); font-weight: 900;
+    background: linear-gradient(180deg, #ff365b, #e50937 55%, #b80026); color: white; font-size: clamp(20px, 4.8vw, 26px); font-weight: 900;
     line-height: 1.2; letter-spacing: .7px; text-decoration: none; box-sizing: border-box;
   }
   body[data-page="home"] .hero-phone-number:focus-visible { outline: 3px solid white; outline-offset: 3px; }

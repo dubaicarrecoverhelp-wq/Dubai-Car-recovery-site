@@ -22,7 +22,6 @@
   const canMeasure = () => Boolean(campaignId) && choice === 'allow' && !privacySignal;
   const measurementId = 'G-LD89L3NJHQ';
   const publicHome = 'https://www.dubaicarrecovery.site/';
-  const handoffTimeout = 650;
   let tagLoaded = false;
   let bookingRecorded = false;
   let lastEvent;
@@ -62,24 +61,13 @@
     document.head.append(script);
   }
 
-  function record(event, contactSurface, afterSend) {
+  function record(event, contactSurface) {
     if (!canMeasure()) return false;
     loadTag();
     const now = Date.now();
     if (event === lastEvent && now - lastEventAt < 800) return false;
     lastEvent = event;
     lastEventAt = now;
-    if (afterSend) {
-      const callback = afterSend;
-      let completed = false;
-      const finish = () => {
-        if (completed) return;
-        completed = true;
-        callback();
-      };
-      setTimeout(finish, handoffTimeout);
-      afterSend = finish;
-    }
     gtag('event', event, {
       send_to: measurementId,
       dcr_campaign_id: campaignId,
@@ -88,7 +76,6 @@
       page_referrer: publicHome,
       page_title: 'Dubai Car Recovery',
       ...(window.dcrPreviewContactTest && { debug_mode: true }),
-      ...(afterSend && { event_callback: afterSend, event_timeout: handoffTimeout }),
     });
     return true;
   }
@@ -140,8 +127,6 @@
       if (window.dcrPreviewContactTest) event.preventDefault();
       if (anchor.classList.contains('prepared-link')) {
         if (!bookingRecorded) bookingRecorded = record('dcr_booking_whatsapp_handoff', 'booking_form');
-      } else if (!window.dcrPreviewContactTest && (!anchor.target || anchor.target === '_self') && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey && canMeasure()) {
-        if (record('dcr_whatsapp_open', 'whatsapp_link', () => location.assign(anchor.href))) event.preventDefault();
       } else {
         record('dcr_whatsapp_open', 'whatsapp_link');
       }
@@ -150,9 +135,7 @@
 
   document.addEventListener('dcr:booking-whatsapp-open', (event) => {
     if (window.dcrPreviewContactTest) event.preventDefault();
-    const continueHandoff = window.dcrPreviewContactTest ? undefined : event.detail?.continueHandoff;
-    const recorded = record('dcr_booking_whatsapp_handoff', 'booking_form', continueHandoff);
+    const recorded = record('dcr_booking_whatsapp_handoff', 'booking_form');
     bookingRecorded ||= recorded;
-    if (recorded && continueHandoff) event.preventDefault();
   });
 })(__DCR_CONTACT_CAMPAIGN_IDS__);
