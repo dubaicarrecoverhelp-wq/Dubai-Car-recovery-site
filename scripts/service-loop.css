@@ -1,0 +1,46 @@
+/* Replace the sparse 3D orbit with a contiguous, readable service row. */
+body[data-page] #our-services { min-height: 0; padding-block: 32px; }
+body[data-page] #our-services .section-title { margin: 0 0 16px; transform: none; }
+body[data-page] #our-services .service-carousel.wrapper {
+  display: block; height: auto; margin-top: 12px; overflow-x: auto !important;
+  text-align: left; padding: 0;
+}
+body[data-page] #our-services .inner {
+  position: relative; display: flex; align-items: stretch; width: max-content; height: auto;
+  top: auto; left: auto; gap: 0; transform: none; transform-style: flat;
+  animation: none !important;
+}
+body[data-page] #our-services .card {
+  position: relative; inset: auto; flex: 0 0 clamp(260px, 28vw, 320px);
+  width: clamp(260px, 28vw, 320px); height: auto; transform: none;
+  backface-visibility: visible; box-shadow: none; border-radius: 14px;
+}
+body[data-page] #our-services .img { padding: 18px; min-height: 340px; }
+body[data-page] #our-services .service-art { height: 72px; min-height: 72px; margin-bottom: 14px; }
+body[data-page] #our-services h3 { font-size: 20px; line-height: 1.2; margin-bottom: 10px; }
+body[data-page] #our-services p {
+  display: block; overflow: visible; -webkit-line-clamp: unset;
+  font-size: 14px; line-height: 1.5;
+}
+.service-loop-toggle {
+  display: block; margin: 0 auto; padding: 7px 14px; border: 1px solid #ff3658;
+  border-radius: 20px; background: #141418; color: white; font: inherit; cursor: pointer;
+}
+.service-loop-toggle:focus-visible { outline: 3px solid white; outline-offset: 3px; }
+body[data-page] #our-services .service-loop-group { display: flex; gap: 0; flex: none; align-items: stretch; }
+body[data-page] #our-services .service-carousel.wrapper.is-looping { overflow-x: hidden !important; }
+body[data-page] #our-services .is-looping .inner {
+  animation: service-loop-travel var(--loop-duration) linear infinite !important;
+}
+@keyframes service-loop-travel { to { transform: translateX(-50%); } }
+body[data-page] #our-services :is(.is-user-paused, .is-reading, :focus-within) .inner,
+body[data-page] #our-services.motion-dormant .inner,
+body.is-background #our-services .inner { animation-play-state: paused !important; }
+@media (hover: hover) {
+  body[data-page] #our-services .service-carousel:hover .inner { animation-play-state: paused !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-page] #our-services .service-carousel.wrapper.is-looping { overflow-x: auto !important; }
+  body[data-page] #our-services .is-looping .inner { animation: none !important; transform: none !important; }
+  #our-services .service-loop-copy, #our-services .service-loop-toggle { display: none; }
+}
