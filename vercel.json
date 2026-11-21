@@ -12,6 +12,13 @@
   ],
   "headers": [
     {
+      "source": "/service-loop.js",
+      "headers": [{"key": "Cache-Control", "value": "public, max-age=31536000, immutable"}]
+    },
+    {"source": "/service-loop.css", "headers": [{"key": "Cache-Control", "value": "public, max-age=31536000, immutable"}]},
+    {"source": "/customer-reviews.js", "headers": [{"key": "Cache-Control", "value": "public, max-age=31536000, immutable"}]},
+    {"source": "/customer-reviews.css", "headers": [{"key": "Cache-Control", "value": "public, max-age=31536000, immutable"}]},
+    {
       "source": "/media/:path*",
       "headers": [
         {
