@@ -16,7 +16,7 @@ assert(heading, 'Expected homepage hero heading');
 replaceOnce(heading[0], '<h1><span class="neon-text">Car Recovery</span><br><span class="metal-text">&amp; Towing in Dubai</span> <span class="hero-availability">24/7</span></h1>');
 replaceOnce(
   'Towing, recovery and flatbed transport for standard, luxury and sports cars, plus bike towing, motorcycle transport, breakdown recovery and roadside assistance across Dubai.',
-  'Car towing, flatbed towing, luxury &amp; sports car towing, car breakdown recovery, accident recovery, roadside assistance, desert &amp; off-road recovery, and motorcycle transport.<strong class="hero-arrival">Arrival time within 15 minutes</strong>'
+  'Car towing, flatbed towing, luxury &amp; sports car towing, car breakdown recovery, accident recovery, roadside assistance, desert &amp; off-road recovery, motorcycle transport, and basement car recovery.<strong class="hero-arrival">Arrival time within 15 minutes</strong>'
 );
 
 const phone = html.match(/<a class="btn call" href="tel:(\+\d+)"/)?.[1];
