@@ -55,7 +55,6 @@ deferBlock("const serviceOrbit=document.querySelector('.service-carousel');", '\
 write('dist/app.js', app);
 const version = createHash('sha256').update(app).digest('hex').slice(0, 12);
 
-for (const name of ['hero-mobile-fast.webp', 'hero-desktop-fast.webp']) fs.copyFileSync(`assets/${name}`, `dist/media/${name}`);
 let pages = 0;
 for (const name of fs.readdirSync('dist', {recursive: true})) {
  if (!name.endsWith('.html')) continue;
@@ -73,10 +72,6 @@ for (const name of fs.readdirSync('dist', {recursive: true})) {
  // Without JavaScript the original gallery remains available.
  html = html.replace(/(<article class="transport-slide"[^>]*>)<img src="(\/media\/recovery\/[^"]+)"([^>]*?)>/g, (_, article, src, attrs) => `${article}<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1672' height='941'%3E%3C/svg%3E" data-gallery-src="${src}"${attrs}><noscript><img src="${src}"${attrs}></noscript>`);
  if (html.includes('data-gallery-src=')) html = html.replace('</head>', '<noscript><style>.transport-slide>img[data-gallery-src]{display:none}</style></noscript></head>');
- html = html.replace(/(<source media="\(min-width:700px\)" srcset=")\/media\/hero-mobile-poster.webp"/, '$1/media/hero-desktop-fast.webp"');
- html = html.replace(/(<img class="hero-video" src=")\/media\/hero-mobile-poster.webp"/, '$1/media/hero-mobile-fast.webp"');
- // Avoid re-fetching the old CSS background behind the picture element.
- if (html.includes('class="hero-picture"')) html = html.replace('</head>', '<style>.hero:has(.hero-picture){background-image:none!important}</style></head>');
  write(file, html);pages++;
 }
-console.log(`Performance overlay: ${pages} pages, immediate contact links, progressive gallery and responsive hero images.`);
+console.log(`Performance overlay: ${pages} pages, immediate contact links and progressive gallery. Original hero imagery retained.`);
